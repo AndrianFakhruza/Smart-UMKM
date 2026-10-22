@@ -25,7 +25,7 @@ export function getProductImage(product?: Partial<Product> | null): string {
  return '/products/kopi-susu.jpg';
 }
 export function getCustomerAvatar(customer?: Partial<Customer> | null): string {
- if (!customer) return '/avatars/dimas.jpg';
+ if (!customer) return '/avatars/budi.jpg';
  if (customer.avatar) return customer.avatar;
  const name = (customer.name || '').toLowerCase();
  if (name.includes('nadia')) return '/avatars/nadia.jpg';
