@@ -1,6 +1,6 @@
-export type Product = { id: number; name: string; category: string; price: number; cost: number; stock: number; minimum: number; icon: string };
+export type Product = { id: number; name: string; category: string; price: number; cost: number; stock: number; minimum: number; icon: string; image?: string };
 export type Sale = { id: string; customer: string; total: number; method: string; time: string; items: string; status: string };
-export type Customer = { name: string; phone: string; tier: string; orders: number; total: number };
+export type Customer = { name: string; phone: string; tier: string; orders: number; total: number; avatar?: string };
 export type Business = { products: Product[]; sales: Sale[]; customers: Customer[]; expenses: { name: string; amount: number; date: string }[]; drafts: { items: Record<string,number>; customer: string }[] };
 export const rupiah = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n);
 export function orderTotal(items: Record<string,number>, products: Product[], discount: number) {
@@ -8,22 +8,53 @@ export function orderTotal(items: Record<string,number>, products: Product[], di
  return { subtotal, discount: subtotal * Math.min(100,Math.max(0,discount))/100, total: subtotal * (1-Math.min(100,Math.max(0,discount))/100) };
 }
 export function recipeUsage(quantity:number) { return { beans:18 * quantity, milk:150 * quantity }; }
+export function getProductImage(product?: Partial<Product> | null): string {
+ if (!product) return '/products/kopi-susu.jpg';
+ if (product.image) return product.image;
+ const name = (product.name || '').toLowerCase();
+ if (name.includes('kopi susu') || name.includes('aren')) return '/products/kopi-susu.jpg';
+ if (name.includes('americano')) return '/products/americano.jpg';
+ if (name.includes('matcha')) return '/products/matcha-latte.jpg';
+ if (name.includes('croissant')) return '/products/croissant.jpg';
+ if (name.includes('cookie')) return '/products/cookies.jpg';
+ if (name.includes('cappuccino')) return '/products/cappuccino.jpg';
+ if (name.includes('velvet') || name.includes('cake') || name.includes('kue')) return '/products/red-velvet.jpg';
+ if (name.includes('tumbler') || name.includes('botol')) return '/products/tumbler.jpg';
+ if (product.category === 'Makanan') return '/products/croissant.jpg';
+ if (product.category === 'Merchandise') return '/products/tumbler.jpg';
+ return '/products/kopi-susu.jpg';
+}
+export function getCustomerAvatar(customer?: Partial<Customer> | null): string {
+ if (!customer) return '/avatars/dimas.jpg';
+ if (customer.avatar) return customer.avatar;
+ const name = (customer.name || '').toLowerCase();
+ if (name.includes('nadia')) return '/avatars/nadia.jpg';
+ if (name.includes('rizky')) return '/avatars/rizky.jpg';
+ if (name.includes('sarah')) return '/avatars/sarah.jpg';
+ if (name.includes('budi')) return '/avatars/budi.jpg';
+ return '/avatars/nadia.jpg';
+}
 export const initialBusiness: Business = {
  products: [
- {id:1,name:'Kopi Susu Gula Aren',category:'Minuman',price:25000,cost:9000,stock:84,minimum:15,icon:'coffee'},
- {id:2,name:'Americano',category:'Minuman',price:20000,cost:6500,stock:62,minimum:15,icon:'coffee'},
- {id:3,name:'Matcha Latte',category:'Minuman',price:30000,cost:12000,stock:8,minimum:15,icon:'cup'},
- {id:4,name:'Croissant Butter',category:'Makanan',price:28000,cost:14000,stock:36,minimum:10,icon:'croissant'},
- {id:5,name:'Chocolate Cookies',category:'Makanan',price:18000,cost:7000,stock:12,minimum:15,icon:'cookie'},
- {id:6,name:'Cappuccino',category:'Minuman',price:28000,cost:11000,stock:48,minimum:15,icon:'coffee'},
- {id:7,name:'Red Velvet Cake',category:'Makanan',price:35000,cost:18000,stock:6,minimum:10,icon:'cake'},
- {id:8,name:'Tumbler Kopi Kita',category:'Merchandise',price:125000,cost:65000,stock:24,minimum:5,icon:'cup'}],
+ {id:1,name:'Kopi Susu Gula Aren',category:'Minuman',price:25000,cost:9000,stock:84,minimum:15,icon:'coffee',image:'/products/kopi-susu.jpg'},
+ {id:2,name:'Americano',category:'Minuman',price:20000,cost:6500,stock:62,minimum:15,icon:'coffee',image:'/products/americano.jpg'},
+ {id:3,name:'Matcha Latte',category:'Minuman',price:30000,cost:12000,stock:8,minimum:15,icon:'cup',image:'/products/matcha-latte.jpg'},
+ {id:4,name:'Croissant Butter',category:'Makanan',price:28000,cost:14000,stock:36,minimum:10,icon:'croissant',image:'/products/croissant.jpg'},
+ {id:5,name:'Chocolate Cookies',category:'Makanan',price:18000,cost:7000,stock:12,minimum:15,icon:'cookie',image:'/products/cookies.jpg'},
+ {id:6,name:'Cappuccino',category:'Minuman',price:28000,cost:11000,stock:48,minimum:15,icon:'coffee',image:'/products/cappuccino.jpg'},
+ {id:7,name:'Red Velvet Cake',category:'Makanan',price:35000,cost:18000,stock:6,minimum:10,icon:'cake',image:'/products/red-velvet.jpg'},
+ {id:8,name:'Tumbler Kopi Kita',category:'Merchandise',price:125000,cost:65000,stock:24,minimum:5,icon:'cup',image:'/products/tumbler.jpg'}],
  sales:[
  {id:'TRX-081024-042',customer:'Nadia Putri',total:78000,method:'QRIS',time:'14:32',items:'Kopi Susu Gula Aren, Croissant Butter',status:'Lunas'},
  {id:'TRX-081024-041',customer:'Pelanggan umum',total:50000,method:'Tunai',time:'14:26',items:'2 Kopi Susu Gula Aren',status:'Lunas'},
  {id:'TRX-081024-040',customer:'Rizky Pratama',total:96000,method:'E-Wallet',time:'14:18',items:'Matcha Latte, Cappuccino',status:'Lunas'},
  {id:'TRX-081024-039',customer:'Pelanggan umum',total:28000,method:'Tunai',time:'14:05',items:'Croissant Butter',status:'Lunas'},
  {id:'TRX-081024-038',customer:'Sarah Aulia',total:125000,method:'Transfer Bank',time:'13:54',items:'Tumbler Kopi Kita',status:'Lunas'}],
- customers:[{name:'Nadia Putri',phone:'',tier:'Gold',orders:24,total:1450000},{name:'Rizky Pratama',phone:'',tier:'Silver',orders:16,total:920000},{name:'Sarah Aulia',phone:'',tier:'Gold',orders:32,total:2100000},{name:'Budi Santoso',phone:'',tier:'Bronze',orders:5,total:250000}],
+ customers:[
+  {name:'Nadia Putri',phone:'',tier:'Gold',orders:24,total:1450000,avatar:'/avatars/nadia.jpg'},
+  {name:'Rizky Pratama',phone:'',tier:'Silver',orders:16,total:920000,avatar:'/avatars/rizky.jpg'},
+  {name:'Sarah Aulia',phone:'',tier:'Gold',orders:32,total:2100000,avatar:'/avatars/sarah.jpg'},
+  {name:'Budi Santoso',phone:'',tier:'Bronze',orders:5,total:250000,avatar:'/avatars/budi.jpg'}
+ ],
  expenses:[{name:'Pembelian bahan baku',amount:850000,date:'2026-10-08'},{name:'Listrik & internet',amount:350000,date:'2026-10-08'},{name:'Biaya operasional',amount:250000,date:'2026-10-07'}],drafts:[]
 };
